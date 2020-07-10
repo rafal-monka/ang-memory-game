@@ -1,0 +1,43 @@
+<h2>Game</h2>
+
+<div>
+  <pre *ngIf="user"><small>User: {{user | json }}]</small></pre>
+</div>
+
+<div *ngIf="(game$ | async) as g; else loadingBlock">
+  <div>
+    <pre>Observable&lt;Game&gt; {{g | json}}</pre>
+  </div>
+
+  <div *ngIf="(game$ | async)?.gameid; else noGameIdBlock">
+    <div  [style.background-color]="wssIsActive?'white':'lightgrey'">
+        <app-players-view ></app-players-view>
+    </div>
+
+    <div *ngIf="(game$ | async)?.status==='NEW' && (game$ | async)?.host===user.sub">
+      <button *ngIf="allPlayersConnected" (click)="startGame()">Start game</button>
+      <app-player-add></app-player-add>
+    </div>
+
+
+  </div>
+
+  <ng-template #noGameIdBlock>
+    <button (click)="newGame()">New game</button>
+  </ng-template>
+</div>
+
+
+<ng-template #loadingBlock>
+    Loading...
+</ng-template>
+
+<div>
+  <br/><b>{{wssIsActive}}:{{wssIsActive?wssClientID:''}}&nbsp;</b><button (click)="connectWss()">Connect</button><button (click)="disconnectWss()">Disconnect</button>
+  <pre>wss.messages.length={{messages.length}}<button (click)="clearMessages()">Clear</button></pre>
+  <ul>
+    <li *ngFor="let msg of messages">
+      <small>{{msg}}</small>
+    </li>
+  </ul>
+</div>

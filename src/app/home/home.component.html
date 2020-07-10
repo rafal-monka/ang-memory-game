@@ -1,0 +1,54 @@
+<div>
+  <select [(ngModel)]="ContextUserID">
+    <option *ngFor="let user of ['1','2']" value="{{user}}">{{user}}</option>
+  </select>
+  <div>
+    Context userid: {{ContextUserID}}
+    <br/>currentStep: {{currentStep}}
+    <br/>currentPlayerInx: {{currentPlayerInx}} [{{players[currentPlayerInx].userid === ContextUserID}}]
+    <br/>currentStep: {{currentStep}}
+    <br/>openCards: {{openCards | json}}
+  </div>
+</div>
+
+<div>
+
+  <table>
+      <tr style="vertical-align: top;">
+        <td>
+            <table border=1>
+                <tr *ngFor="let row of _set8; let r=index">
+                    <td *ngFor="let col of _set8; let c=index">
+                      <div class="card" (click)="onCardClick(r,c)">
+                        {{board[r][c].value}}
+                        <br/><small style="color: blue">{{board[r][c].count}}</small>
+                      </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table border=1>
+                <tr *ngFor="let player of players; let i=index">
+                    <td>{{currentPlayerInx===i?'--->':''}}</td>
+                    <td>#{{player.userid}}</td>
+                    <td>{{player.name}}</td>
+                    <td>{{player.score}}</td>
+                    <td>{{player.role}}{{player.level?'/'+player.level:''}}</td>
+                </tr>
+            </table>
+
+            <br/>
+            <table border=1>
+              <tr *ngFor="let row of _set8; let r=index">
+                  <td *ngFor="let col of _set8; let c=index">
+                    <div class="memory">{{memory[row][col]}}</div>
+                  </td>
+              </tr>
+            </table>
+
+        </td>
+      </tr>
+  </table>
+
+</div>

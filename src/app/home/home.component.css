@@ -1,0 +1,11 @@
+.card {
+    width: 55px;
+    height: 55px;
+    text-align: center;
+}
+
+.memory {
+  width: 25px;
+  /* height: 25px; */
+  text-align: center;
+}
