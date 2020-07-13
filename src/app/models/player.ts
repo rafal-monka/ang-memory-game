@@ -4,8 +4,8 @@ export class Player {
     email: string = ''
     name: string = ''
     role: string = ''
-    points: number = 0
-    tries: number = 0
+    score: number = 0
+    missed: number = 0
     level: number = 0
     wssClientID: string = ''
     connected: boolean = false

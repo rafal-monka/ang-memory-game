@@ -10,15 +10,17 @@
   </div>
 
   <div *ngIf="(game$ | async)?.gameid; else noGameIdBlock">
-    <div  [style.background-color]="wssIsActive?'white':'lightgrey'">
+    <div [style.background-color]="wssIsActive?'white':'lightgrey'">
         <app-players-view ></app-players-view>
     </div>
 
     <div *ngIf="(game$ | async)?.status==='NEW' && (game$ | async)?.host===user.sub">
-      <button *ngIf="allPlayersConnected" (click)="startGame()">Start game</button>
       <app-player-add></app-player-add>
     </div>
 
+    <div>
+      <br/><b>{{wssIsActive}}:{{wssIsActive?wssClientID:''}}&nbsp;</b><button (click)="connectWss()">Connect</button><button (click)="disconnectWss()">Disconnect</button>
+    </div>
 
   </div>
 
@@ -32,8 +34,25 @@
     Loading...
 </ng-template>
 
+<button *ngIf="true || allPlayersConnected" (click)="startGame()">Start game</button>
+
+<div *ngIf="board$ | async as board">
+  <table border=1>
+    <tr *ngFor="let row of _setSIZE; let r=index">
+        <td *ngFor="let col of _setSIZE; let c=index">
+          <div class="card" (click)="onCardClick(r,c, board[r][c].value)" [style.background-color]="board[r][c].open?'lightgreen':''">
+              <b>{{board[r][c].open?board[r][c].value:(board[r][c].value===undefined?'':'^'+board[r][c].value)}}</b>
+              <br/><small style="color: blue">{{board[r][c].count}}</small>
+          </div>
+        </td>
+    </tr>
+</table>
+
+</div>
+
+
 <div>
-  <br/><b>{{wssIsActive}}:{{wssIsActive?wssClientID:''}}&nbsp;</b><button (click)="connectWss()">Connect</button><button (click)="disconnectWss()">Disconnect</button>
+
   <pre>wss.messages.length={{messages.length}}<button (click)="clearMessages()">Clear</button></pre>
   <ul>
     <li *ngFor="let msg of messages">

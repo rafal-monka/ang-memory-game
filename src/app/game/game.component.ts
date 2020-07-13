@@ -12,8 +12,11 @@ import { Game } from '../models/game';
 import { User } from '../models/user';
 
 import {PlayerInit, PlayerFill, PlayerConnectInit, PlayerConnectNew, PlayerDisconnect, PlayerRemove, PlayerAdd} from '../player.actions';
-import {GameInit, GameStart} from '../game.actions';
+import {GameInit, GameStart, GameGeneral} from '../game.actions';
 import {UserInit} from '../user.actions';
+import {BoardInit, BoardOpenCard, BoardTakeCards, BoardPutBackCards} from '../board.actions';
+
+const CONST_SIZE = 8
 
 @Component({
   selector: 'app-game',
@@ -23,15 +26,23 @@ import {UserInit} from '../user.actions';
 export class GameComponent implements OnInit {
 
   gameid : string //###Observable or normal property???
+  currentPlayerInx: number //###
+  players: Array<any>
+
   allPlayersConnected: boolean = true
   wssClientID: string
-  game$: Observable<Game>;
-  user$: Observable<User>
+
   user: User
   socket: WebSocket
   wssIsActive: boolean = false
   token: string
   messages: Array<any> = []
+
+  _setSIZE: Array<number> = [...Array(CONST_SIZE).keys()]
+  game$: Observable<Game>
+  user$: Observable<User>
+  players$: Observable<Player[]>
+  board$: Observable<Array<any>>
 
   constructor(
     private router: Router,
@@ -41,45 +52,79 @@ export class GameComponent implements OnInit {
     private api: ApiService,
     private userStore: Store<{ user: User }>,
     private playerStore: Store<{ players: Player[] }>,
-    private gameStore: Store<{ game: Game }> ) {
-      this.game$ = gameStore.pipe(select('game'));
-      this.user$ = userStore.pipe(select('user'));
+    private gameStore: Store<{ game: Game }>,
+    private boardStore: Store<{ board: Array<any> }>
+    ) {
+      this.game$ = gameStore.pipe(select('game'))
+      this.players$ = playerStore.pipe(select('players'))
+      this.user$ = userStore.pipe(select('user'))
+      this.board$ = boardStore.pipe(select('board')) //???init board
+  }
+
+  private go(user) {
+    console.log('go', user)
+    this.userStore.dispatch(new UserInit(user))
+    //router - new or existing game
+    this.activatedRoute.params.subscribe(params => {
+      console.log('params.gameid', params.gameid)
+      if (params.gameid) {
+          this.retrieveGame(params.gameid)
+      } else {
+          this.gameStore.dispatch(new GameInit({})) //empty
+      }
+    });
   }
 
   ngOnInit() {
+      console.log('game.component.ngOnInit()')
+      //@@@AUTH0
+      if (false) this.go({
+        sub: 'google-oauth2|103332170467986196787',
+        email: 'monka.rafal@gmail.com',
+        name: 'Test user RM',
+        email_verified: true
+      })
+
       //Auth0 token
-      this.auth.getTokenSilently$().subscribe(res => {
+      if (true) this.auth.getTokenSilently$().subscribe(res => {
           this.token = res
       })
 
       //Auth0 user profile
-      this.auth.getUser$().subscribe(user => {
-          this.userStore.dispatch(new UserInit(user))
-
-          //router - new or existing game
-          this.activatedRoute.params.subscribe(params => {
-            if (params.gameid) {
-                this.retrieveGame(params.gameid)
-            } else {
-                this.gameStore.dispatch(new GameInit({})) //empty
-            }
-          });
+      if (true) this.auth.getUser$().subscribe(user => {
+          this.go(user)
       })
 
-      this.game$.subscribe(value => {
-        console.log('this.game$.subscribe', value)
-        this.gameid = value.gameid //###???
-        //###this.allPlayersConnected
-      })
+      // this.game$.subscribe(value => {
+      //   console.log('this.game$.subscribe', value)
+      //   this.gameid = value.gameid //###???
+      //   //###this.allPlayersConnected
+      // })
 
       this.user$.subscribe(value => {
         this.user = value
       })
+
+      this.board$.subscribe(value => {
+        //console.log('board$.subscribe', value)
+      })
+
+      this.game$.subscribe(value => {
+        console.log('game-component.game$.subscribe', value.currentPlayerInx)
+        this.currentPlayerInx = value.currentPlayerInx
+      })
+
+      this.players$.subscribe(value => {
+        console.log('game-component.players$.subscribe', value)
+        this.players = value
+      })
   }
 
   private retrieveGame(gameid) {
+    console.log('retrieveGame', gameid)
     this.api.game$(gameid).subscribe(
       res => {
+          console.log('retrieveGame.subscribe', res)
           let game : Game = null
           let players : Array<Player> = []
           if (res) {
@@ -90,6 +135,7 @@ export class GameComponent implements OnInit {
             game.host = res.host
             players = res.players.map(p => { return {...p, gameid: gameid, connected: (p.level > 0)} } )
           }
+          this.gameid = gameid
           this.gameStore.dispatch(new GameInit(game))
           this.playerStore.dispatch(new PlayerFill(players))
 
@@ -121,11 +167,55 @@ export class GameComponent implements OnInit {
     );
   }
 
-  startGame() {
-    this.api.resumeGame$(this.gameid, {}).subscribe(
+  startGameAPIXXXX() {
+    this.api.resumeGame$(this.gameid, {status: 'STARTED'}).subscribe(
       res => {
-        this.gameStore.dispatch(new GameStart(null))
+        this.gameStore.dispatch(new GameStart(res))
       })
+  }
+
+  private sendWssMessage(action, value) {
+      const message = {
+          sender: this.wssClientID,
+          action: action,
+          value: value,
+      };
+      this.wsSend(message)
+  }
+
+  startGame() {
+      this.sendWssMessage('START', this.gameid)
+  }
+
+  onCardClick(r,c,v) {
+      console.log('onCardClick', r,c,v)
+      console.log('users', this.user.sub, this.players[this.currentPlayerInx].userid)
+      //###@@@api.put (count++).then(
+
+      if (this.user.sub === this.players[this.currentPlayerInx].userid) {
+          let card = {
+              row: r,
+              col: c,
+              open: true,
+              value: v,
+              count: 1 /*###from DB*/
+          }
+          this.sendWssMessage('CLICKCARD', card)
+
+      } else {
+          alert('Not your turn! Now is the move of player #'+this.players[this.currentPlayerInx].userid)
+      }
+
+  }
+
+  wsSend(message) {
+      console.log('wsSend', this.socket)
+      if (this.socket.readyState === 1) { //https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
+          this.socket.send( JSON.stringify(message) )
+      } else {
+          alert(' WebSocket is already in CONNECTING, CLOSING or CLOSED state.')
+      }
+
   }
 
   connectWss() {
@@ -148,10 +238,15 @@ export class GameComponent implements OnInit {
               this.wssIsActive = true
           },
           (msg) => {
-              this.messages.push('[CLIENT] callbackOnMessage')
+              //this.messages.push('[CLIENT] callbackOnMessage')
               this.messages.push(msg)
               let obj = JSON.parse(msg)
               switch (obj.event) {
+
+                  case 'TEST':
+                      alert(JSON.stringify(obj.payload))
+                      break
+
                   case 'ERROR':
                       this.disconnectWss()
                       alert(obj.payload)
@@ -159,6 +254,7 @@ export class GameComponent implements OnInit {
                       this.router.navigate(['/']);
                       break;
 
+                  //events - preparing game
                   case 'CONNECTION':
                       this.wssClientID = obj.payload.wssClientID
                       this.playerStore.dispatch(new PlayerConnectInit( obj.payload.playersInGame ))
@@ -179,6 +275,40 @@ export class GameComponent implements OnInit {
                   case 'PLAYER_ADDED_TO_GAME':
                     this.playerStore.dispatch(new PlayerAdd( obj.payload.player ))
                     break;
+
+                  //events - playing game
+                  case 'INITGAME': //###not used
+                      //this.boardStore.dispatch(new BoardInit( obj.payload ))
+                      break;
+
+                  case 'RESUME':
+                      //@@@players, etc. - dispatch game state
+                      this.playerStore.dispatch(new PlayerConnectInit( obj.payload.players ))
+                      this.boardStore.dispatch(new BoardInit( obj.payload.board ))
+                      break;
+
+                  case 'OPENCARD':
+                    //this.gameStore.dispatch(new GameGeneral(obj.event, obj.payload) )
+                    this.boardStore.dispatch(new BoardOpenCard( obj.payload ))
+                    break;
+
+                  case 'TAKECARDS':
+                    this.boardStore.dispatch(new BoardTakeCards( obj.payload ))
+                    break;
+
+                  case 'PUTBACKCARDS':
+                    this.boardStore.dispatch(new BoardPutBackCards( obj.payload ))
+                    break;
+
+                  case 'NEXTPLAYER':
+                    this.gameStore.dispatch(new GameGeneral(obj.event, obj.payload) )
+                    break;
+
+                  case 'GAMEOVER':
+                    break;
+
+                  default:
+                    alert('ERROR. Unknown event '+obj.event)
               }
           },
           () => {

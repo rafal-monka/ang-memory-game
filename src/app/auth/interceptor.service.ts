@@ -20,6 +20,10 @@ export class InterceptorService implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
+    let x: Observable<HttpEvent<any>>
+    //@@@AUTH0
+    if (false) return next.handle(req);
+
     return this.auth.getTokenSilently$().pipe(
       mergeMap(token => {
         const tokenReq = req.clone({

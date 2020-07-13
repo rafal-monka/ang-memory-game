@@ -9,8 +9,8 @@ export function PlayerReducer(state = initialState, action: ActionEx) {
     case PlayerActionTypes.Init:
       return [action.payload];
 
-      case PlayerActionTypes.Fill:
-        return [...action.payload];
+    case PlayerActionTypes.Fill:
+      return [...action.payload];
 
     case PlayerActionTypes.Add:
       return [...state, action.payload];
@@ -61,6 +61,7 @@ export function PlayerReducer(state = initialState, action: ActionEx) {
           }
         })
         return tmp;
+
 
     default:
       return state;

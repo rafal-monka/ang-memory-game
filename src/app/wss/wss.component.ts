@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { AuthService } from '../auth/auth.service';
+//import { AuthService } from '../auth/auth.service';
 import { Utils } from '../utils';
 
 @Component({
   selector: 'app-wss',
   templateUrl: './wss.component.html',
   styleUrls: ['./wss.component.css'],
-  providers: [ AuthService, Utils ]
+  providers: [ /*AuthService,*/ Utils ]
 })
 export class WssComponent implements OnInit {
 
@@ -20,15 +20,19 @@ export class WssComponent implements OnInit {
   token: string
   profile : any
   constructor(
-    private auth: AuthService,
+    // private auth: AuthService,
     private utils: Utils) { }
 
   ngOnInit() {
+      console.log('wss.component.ngOnInit()')
       //Auth0 token
-      this.auth.getTokenSilently$().subscribe(res => {
-          //console.log(res)
-          this.token = res
-      })
+      return;
+
+      //####OFF
+      // this.auth.getTokenSilently$().subscribe(res => {
+      //     //console.log(res)
+      //     this.token = res
+      // })
 
       //Auth0 user profile
       this.auth.userProfile$.subscribe(data => {

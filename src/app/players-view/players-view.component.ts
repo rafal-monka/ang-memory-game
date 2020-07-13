@@ -18,7 +18,7 @@ export class PlayersViewComponent implements OnInit {
   players$: Observable<Player[]>;
   gameid : string
   game$: Observable<Game>;
-  game: Game
+  game: Game //###
   user$: Observable<User>;
   user: User
 
@@ -34,7 +34,8 @@ export class PlayersViewComponent implements OnInit {
 
   ngOnInit() {
     this.game$.subscribe(value => {
-      this.game = value
+      this.game = value //###
+      //console.log('currentPlayerInx', value.currentPlayerInx)
     })
 
     this.user$.subscribe(value => {
@@ -43,14 +44,14 @@ export class PlayersViewComponent implements OnInit {
 
     this.players$.subscribe(value => {
       console.log('players$.subscribe', value)
-      let allPlayersConnected = value.reduce((out, item) => out = out && item.connected, true)
-      this.gameStore.dispatch(new GamePlayersConnected(allPlayersConnected));
+      //---let allPlayersConnected = value.reduce((out, item) => out = out && item.connected, true)
+      //---this.gameStore.dispatch(new GamePlayersConnected(allPlayersConnected));
     })
 
   }
 
   removePlayer(email) {
-    this.api.removePlayer$(this.game.gameid, email).subscribe(
+    this.api.removePlayer$(this.game.gameid /*###*/, email).subscribe(
       res => {
         this.playersStore.dispatch(new PlayerRemove(email));
       }

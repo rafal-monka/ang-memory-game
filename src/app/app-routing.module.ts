@@ -12,8 +12,8 @@ import { HomeComponent } from './home/home.component';
 const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'external-api', component: ExternalApiComponent, canActivate: [AuthGuard] },
-  { path: 'wss', redirectTo: 'wss/', pathMatch: 'full', canActivate: [AuthGuard] },
-  { path: 'wss/:gameid', component: WssComponent, canActivate: [AuthGuard] },
+  { path: 'wss', redirectTo: 'wss/', pathMatch: 'full', canActivate: [AuthGuard] }, //@@@AUTH0
+  { path: 'wss/:gameid', component: WssComponent, canActivate: [AuthGuard] }, //@@@AUTH0
   { path: 'test', component: HomeComponent},
   { path: "**", component : HomeComponent }
 ];

@@ -2,26 +2,30 @@
   <select [(ngModel)]="ContextUserID">
     <option *ngFor="let user of ['1','2']" value="{{user}}">{{user}}</option>
   </select>
-  <div>
-    Context userid: {{ContextUserID}}
-    <br/>currentStep: {{currentStep}}
-    <br/>currentPlayerInx: {{currentPlayerInx}} [{{players[currentPlayerInx].userid === ContextUserID}}]
-    <br/>currentStep: {{currentStep}}
-    <br/>openCards: {{openCards | json}}
+  <div *ngIf="gamePlayed">
+        Context userid: {{ContextUserID}}
+        <br/>currentStep: {{currentStep}}
+        <br/>currentPlayerInx: {{currentPlayerInx}} [{{players[currentPlayerInx].userid === ContextUserID}}]
+        <br/>currentStep: {{currentStep}}
+        <br/>openCards: {{openCards | json}}
+        <br/>cardsLeft: {{cardsLeft}}
   </div>
 </div>
 
-<div>
+<button (click)="playGame()">Play</button>
+
+<div *ngIf="gamePlayed">
 
   <table>
       <tr style="vertical-align: top;">
         <td>
             <table border=1>
-                <tr *ngFor="let row of _set8; let r=index">
-                    <td *ngFor="let col of _set8; let c=index">
+                <tr *ngFor="let row of _setSIZE; let r=index">
+                    <td *ngFor="let col of _setSIZE; let c=index">
                       <div class="card" (click)="onCardClick(r,c)">
-                        {{board[r][c].value}}
+                        <b>{{board[r][c].value}}</b>
                         <br/><small style="color: blue">{{board[r][c].count}}</small>
+                        <br/><small style="color: red">{{boardCopy[r][c].value}}</small>
                       </div>
                     </td>
                 </tr>
@@ -34,18 +38,30 @@
                     <td>#{{player.userid}}</td>
                     <td>{{player.name}}</td>
                     <td>{{player.score}}</td>
+                    <td>{{player.missed}}</td>
                     <td>{{player.role}}{{player.level?'/'+player.level:''}}</td>
                 </tr>
             </table>
 
             <br/>
             <table border=1>
-              <tr *ngFor="let row of _set8; let r=index">
-                  <td *ngFor="let col of _set8; let c=index">
+              <tr *ngFor="let row of _setSIZE; let r=index">
+                  <td *ngFor="let col of _setSIZE; let c=index">
                     <div class="memory">{{memory[row][col]}}</div>
                   </td>
               </tr>
             </table>
+
+
+            <!-- <div>
+                <pre>openCards: {{openCards | json}}</pre>
+            </div>
+            <div>
+              <pre>knownCards: {{knownCards | json}}</pre>
+            </div>
+            <div>
+                <pre>unknownCards: {{unknownCards | json}}</pre>
+            </div> -->
 
         </td>
       </tr>

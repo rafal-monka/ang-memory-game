@@ -1,12 +1,26 @@
 
 <h4>List of Players</h4>
-<ul class="players">
+<!-- <ul class="players">
   <li *ngFor="let player of players$ | async; let i=index">
     <span>{{i+1}}.</span><span *ngIf="player.connected" style="background-color: green;">[CONNECTED]</span>
     <span title="{{player | json}}">{{player.points}} {{player.name}} [{{player.role==='COMPUTER'?player.level:player.email}}]</span>
     <button *ngIf="i>0 && game.host===user.sub" (click)="removePlayer(player.email)">Remove</button>
   </li>
-</ul>
+</ul> -->
+
+<table border=1 *ngIf="game$ | async as game">
+  <tr *ngFor="let player of players$ | async; let i=index">
+      <td>{{game.currentPlayerInx===i?'--->':''}}</td>
+      <td><span *ngIf="player.connected" style="background-color: green;">[*]</span></td>
+      <td><span title="{{player | json}}">{{player.name}}</span></td>
+      <td>{{player.role==='COMPUTER'?player.level:player.email}}</td>
+      <td>{{player.score}}</td>
+      <td>{{player.missed}}</td>
+      <td><button *ngIf="i>0 && game.host===user.sub" (click)="removePlayer(player.email)">Remove</button></td>
+      <td>{{player.userid}}</td>
+      <td>{{player.wssClientID}}</td>
+    </tr>
+</table>
 <!-- {{game.host}} user={{user | json}} -->
 <br/>
 <!-- {{player.email}} {{player.name}} {{player.email}} {{player.userid}} {{player.wssClientID}} {{player.level}} {{player.points}} -->
