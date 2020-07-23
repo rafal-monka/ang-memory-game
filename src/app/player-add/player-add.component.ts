@@ -13,32 +13,32 @@ import { ApiService } from '../api.service';
   styleUrls: ['./player-add.component.css']
 })
 export class PlayerAddComponent {
-
-  game: Observable<Game>;
-  players: Observable<Player[]>;
+  text: string
+  //game: Observable<Game>;
+  //players: Observable<Player[]>;
   gameid : string
 
   constructor(
     private api: ApiService,
     private gameStore: Store<{ game: Game }>,
-    private playersStore: Store<{ players: Player[] }>) {
-    this.players = playersStore.pipe(select('players'));
-    this.game = gameStore.pipe(select('game'));
+    //private playersStore: Store<{ players: Player[] }>
+    ) {
+    //this.players = playersStore.pipe(select('players'));
+    //---this.game = gameStore.pipe(select('game'));
   }
 
   ngOnInit() {
-    this.game.subscribe(value => {
-      console.log('PlayerAddComponent.ngOnInit() / this.game.subscribe, value=', value)
-      this.gameid = value.gameid
-    })
+     // this.game.
+      this.gameStore.pipe(select('game')).subscribe(value => {
+          this.gameid = value.gameid
+      })
   }
 
-  AddPlayer(text: string) {
-    let playerText = text.trim()
+  AddPlayer() {
+    let playerText = this.text.trim()
     if (playerText === '') return
-    console.log('PlayerAddComponent.AddPlayer()')
-    console.log('AddPlayer, this.game=', this.game)
-    //###check if email already exists
+
+    //###check if email already exists, better validation and GUI
     let hashkey = Date.now().toString(32).toUpperCase() //for Computer user unique(id) value
     let ifEmail = playerText.indexOf('@') > -1
     let userid = ifEmail ? '#USERID_NOT_KNOWN_YET#' : hashkey
@@ -47,16 +47,16 @@ export class PlayerAddComponent {
     let level = ifEmail ? null : playerText.substring(playerText.indexOf(':')+1) || 100
 
     this.api.addPlayer$(this.gameid, userid, email, name, level).subscribe(
-      res => {
-        console.log('PlayerAddComponent.AddPlayer() / this.api.addPlayer$().subscribe - res', res)
-        const player : Player = res
-        player.gameid = this.gameid
-        player.connected = (player.level > 0)
-        this.playersStore.dispatch(new PlayerAdd(player))
-      },
-      error => {
-         alert('Cannot add new player\n'+JSON.stringify(error.error))
-      }
+        res => {
+            this.text = ''
+            const player : Player = res
+            player.gameid = this.gameid
+            //---this.playersStore.dispatch(new PlayerAdd(player))
+            this.gameStore.dispatch(new PlayerAdd(player))
+        },
+        error => {
+            alert('Cannot add new player\n'+JSON.stringify(error.error))
+        }
     );
   }
 

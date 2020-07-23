@@ -11,16 +11,29 @@ export class ApiService {
 
   constructor(private http: HttpClient) { }
 
+  //###DELETE
   ping$(): Observable<any> {
     return this.http.get('/api/external');
+  }
+
+  themes$(): Observable<any> {
+    return this.http.get(`/api/theme`);
+  }
+
+  pictures$(theme): Observable<any> {
+    return this.http.get(`/api/picture/${theme}`);
+  }
+
+  games$(): Observable<any> {
+    return this.http.get(`/api/game`);
   }
 
   game$(gameid): Observable<any> {
     return this.http.get(`/api/game/${gameid}`);
   }
 
-  newGame$(user: User): Observable<any> {
-    return this.http.post('/api/game', {
+  newGame$(user: User, theme): Observable<any> {
+    return this.http.post('/api/game/'+theme, {
       user: user
     });
   }

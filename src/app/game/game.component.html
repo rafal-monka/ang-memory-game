@@ -1,62 +1,92 @@
-<h2>Game</h2>
-
 <div>
-  <pre *ngIf="user"><small>User: {{user | json }}]</small></pre>
-</div>
-
-<div *ngIf="(game$ | async) as g; else loadingBlock">
-  <div>
-    <pre>Observable&lt;Game&gt; {{g | json}}</pre>
-  </div>
-
-  <div *ngIf="(game$ | async)?.gameid; else noGameIdBlock">
-    <div [style.background-color]="wssIsActive?'white':'lightgrey'">
-        <app-players-view ></app-players-view>
+    <div *ngIf="user">
+        {{user.name}} {{user.email}}
+    </div>
+    <div>
+      <button class="btn btn-primary btn-sm" *ngIf="!wssIsActive" (click)="connectWss(game.gameid)">Connect</button>
+      <button class="btn btn-warning btn-sm" *ngIf="wssIsActive" (click)="disconnectWss()">Disconnect</button>
+      <pre>web socket client: {{wssIsActive?'Connected as '+wssClientID:'Not connected'}}</pre>
     </div>
 
-    <div *ngIf="(game$ | async)?.status==='NEW' && (game$ | async)?.host===user.sub">
-      <app-player-add></app-player-add>
+    <div *ngIf="game.gameid">
+        <div>
+            <span>Game
+                #{{game.gameid}} {{game.theme}} {{game.backgroundImage}}
+                Status: {{game.status}}
+                Name: {{game.name}}
+                currentStep: {{game.currentStep}}
+                currentPlayerInx: {{game.currentPlayerInx}}
+                cardsLeft: {{game.cardsLeft}}
+                allPlayersConnected: {{allPlayersConnected}}
+            </span>
+        </div>
+        <br/>
+    </div>
+
+    <div *ngIf="yourMove && allPlayersConnected" id="your-move"><b>Now it's your turn</b></div>
+
+    <div *ngIf="game.gameid" style="width: 100%; text-align: center;">
+      <div style="display: inline-block;">
+        <div [style.opacity]="allPlayersConnected || game.status==='NEW'?'100%':'40%'" class="game-panel">
+
+
+            <app-board [user]="user" [theme]="game.theme" [allPlayersConnected]="allPlayersConnected" [yourMove]="yourMove"></app-board>
+
+            <!-- <div class="board"
+                *ngIf="['STARTED','ENDED'].indexOf(game.status)>-1 && board && pictures && pictures.length > 0">
+                <div class="board-background" [ngStyle]="{backgroundSize:'cover', backgroundImage:'url(../../assets/themes/'+game.theme+'/x-size/'+pictures[game.backgroundImage].imgsrc+')'}">
+                  <div *ngIf="game.status==='STARTED'" [ngStyle]="{background:'rgba(255, 255, 255, 0.8)'}">
+                    <div class="board-row" *ngFor="let row of _setSIZE; let r=index">
+                        <div class="board-card"
+                            *ngFor="let col of _setSIZE; let c=index"
+                            (click)="onCardClick(r,c, board[r][c].value)"
+                            [ngStyle]="{backgroundSize:'cover', backgroundImage:board[r][c].value<0?'':(board[r][c].open?'url(../../assets/themes/'+game.theme+'/'+pictures[board[r][c].value].imgsrc+')':'url(../../assets/themes/'+game.theme+'/_.jpg)')}">
+
+                            <div>
+                                <b>{{board[r][c].value<0 ? '' : '^'+board[r][c].value }}</b>
+                                <br/><small style="color: blue">{{board[r][c].count}}</small>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div> -->
+
+
+            <div>
+                <div>
+                    <h3 *ngIf="game.status==='ENDED'">Game over</h3>
+                    <app-players-view ></app-players-view>
+                </div>
+
+                <div *ngIf="game.status==='NEW' && game.host===user.email"> <!--or inside app-player-add-->
+                    <app-player-add></app-player-add>
+                </div>
+
+            </div>
+
+        </div>
+      </div>
     </div>
 
     <div>
-      <br/><b>{{wssIsActive}}:{{wssIsActive?wssClientID:''}}&nbsp;</b><button (click)="connectWss()">Connect</button><button (click)="disconnectWss()">Disconnect</button>
+      <button  class="btn btn-success" *ngIf="game.status==='NEW'" (click)="startGame()">Start game</button>
     </div>
 
-  </div>
-
-  <ng-template #noGameIdBlock>
-    <button (click)="newGame()">New game</button>
-  </ng-template>
 </div>
+
 
 
 <ng-template #loadingBlock>
     Loading...
 </ng-template>
 
-<button *ngIf="true || allPlayersConnected" (click)="startGame()">Start game</button>
-
-<div *ngIf="board$ | async as board">
-  <table border=1>
-    <tr *ngFor="let row of _setSIZE; let r=index">
-        <td *ngFor="let col of _setSIZE; let c=index">
-          <div class="card" (click)="onCardClick(r,c, board[r][c].value)" [style.background-color]="board[r][c].open?'lightgreen':''">
-              <b>{{board[r][c].open?board[r][c].value:(board[r][c].value===undefined?'':'^'+board[r][c].value)}}</b>
-              <br/><small style="color: blue">{{board[r][c].count}}</small>
-          </div>
-        </td>
-    </tr>
-</table>
-
-</div>
-
-
-<div>
-
+<!-- <div>
   <pre>wss.messages.length={{messages.length}}<button (click)="clearMessages()">Clear</button></pre>
   <ul>
     <li *ngFor="let msg of messages">
       <small>{{msg}}</small>
     </li>
   </ul>
-</div>
+</div> -->
+

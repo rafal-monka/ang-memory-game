@@ -2,30 +2,18 @@
 import {Action} from '@ngrx/store';
 
 export enum PlayerActionTypes {
-  Fill = '[Player Component] Fill',
-  Init = '[Player Component] Init',
   Add = '[Player Component] Add',
   Remove = '[Player Component] Remove',
   ConnectInit = '[Player Component] ConnectInit',
   ConnectNew = '[Player Component] ConnectNew',
-  Disconnect = '[Player Component] Disconnect'
+  Disconnect = '[Player Component] Disconnect',
+  Score = '[Player Component] Score',
+  Missed = '[Player Component] Missed'
 }
 
 export class ActionEx implements Action {
   readonly type;
   payload: any;
-}
-
-export class PlayerInit implements ActionEx {
-  readonly type = PlayerActionTypes.Init;
-  constructor(public payload: any) {
-  }
-}
-
-export class PlayerFill implements ActionEx {
-  readonly type = PlayerActionTypes.Fill;
-  constructor(public payload: any) {
-  }
 }
 
 export class PlayerAdd implements ActionEx {
@@ -57,3 +45,17 @@ export class PlayerDisconnect implements ActionEx {
   constructor(public payload: any) {
   }
 }
+
+export class PlayerScore implements ActionEx {
+  readonly type = PlayerActionTypes.Score;
+  constructor(public payload: any) {
+  }
+}
+
+export class PlayerMissed implements ActionEx {
+  readonly type = PlayerActionTypes.Missed;
+  constructor(public payload: any) {
+  }
+}
+
+export type PlayerActions = PlayerConnectInit | PlayerConnectNew | PlayerDisconnect | PlayerRemove | PlayerAdd | PlayerScore | PlayerMissed

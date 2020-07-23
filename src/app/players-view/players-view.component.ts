@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import {Observable} from 'rxjs';
-import {select, Store} from '@ngrx/store';
+import { combineLatest, Subscription} from 'rxjs';
+import { Store} from '@ngrx/store';
 
 import { User } from '../models/user';
-import {Player} from '../models/player';
+import { Player } from '../models/player';
 import { Game } from '../models/game';
-import { PlayerInit, PlayerRemove } from '../player.actions';
-import { GamePlayersConnected } from '../game.actions';
+import { PlayerRemove } from '../player.actions';
 import { ApiService } from '../api.service';
 
 @Component({
@@ -15,46 +14,37 @@ import { ApiService } from '../api.service';
   styleUrls: ['./players-view.component.css']
 })
 export class PlayersViewComponent implements OnInit {
-  players$: Observable<Player[]>;
-  gameid : string
-  game$: Observable<Game>;
-  game: Game //###
-  user$: Observable<User>;
+  subscription: Subscription
+  game: Game
+  players: Array<any>
   user: User
 
   constructor(
-    private api: ApiService,
-    private userStore: Store<{ user: User }>,
-    private gameStore: Store<{ game: Game }>,
-    private playersStore: Store<{ players: Player[] }>) {
-      this.user$ = userStore.pipe(select('user'))
-      this.game$ = gameStore.pipe(select('game'))
-      this.players$ = playersStore.pipe(select('players'))
+      private api: ApiService,
+      private gameStore: Store<{ user: User, game: Game, players: Player[] }>) {
   }
 
   ngOnInit() {
-    this.game$.subscribe(value => {
-      this.game = value //###
-      //console.log('currentPlayerInx', value.currentPlayerInx)
-    })
+      this.subscription = combineLatest(
+          this.gameStore.select('user'),
+          this.gameStore.select('game'),
+          this.gameStore.select('players')
+      ).subscribe(([user, game, players]) => {
+          this.user = user
+          this.game = game
+          this.players = players
+      })
+  }
 
-    this.user$.subscribe(value => {
-      this.user = value
-    })
-
-    this.players$.subscribe(value => {
-      console.log('players$.subscribe', value)
-      //---let allPlayersConnected = value.reduce((out, item) => out = out && item.connected, true)
-      //---this.gameStore.dispatch(new GamePlayersConnected(allPlayersConnected));
-    })
-
+  ngOnDestroy() {
+      if (this.subscription) this.subscription.unsubscribe()
   }
 
   removePlayer(email) {
-    this.api.removePlayer$(this.game.gameid /*###*/, email).subscribe(
-      res => {
-        this.playersStore.dispatch(new PlayerRemove(email));
-      }
-    )
+      this.api.removePlayer$(this.game.gameid, email).subscribe(
+          res => {
+              this.gameStore.dispatch(new PlayerRemove(email));
+          }
+      )
   }
 }

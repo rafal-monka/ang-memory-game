@@ -5,12 +5,13 @@ import { FormsModule } from '@angular/forms';
 
 import { StoreModule } from '@ngrx/store';
 
+import { Utils } from './utils';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ExternalApiComponent } from './external-api/external-api.component';
-import { WssComponent } from './wss/wss.component';
+// import { WssComponent } from './wss/wss.component';
 import { PlayersViewComponent } from './players-view/players-view.component';
 import { PlayerAddComponent } from './player-add/player-add.component';
 import { GameComponent } from './game/game.component';
@@ -20,6 +21,9 @@ import { GameReducer } from './game.reducer';
 import { PlayerReducer } from './player.reducer';
 import { UserReducer } from './user.reducer';
 import { BoardReducer } from './board.reducer';
+import { BoardComponent } from './board/board.component';
+import { GamesComponent } from './games/games.component';
+import { NewGameComponent } from './new-game/new-game.component';
 
 @NgModule({
    declarations: [
@@ -27,11 +31,14 @@ import { BoardReducer } from './board.reducer';
       NavBarComponent,
       ProfileComponent,
       ExternalApiComponent,
-      WssComponent,
+      //WssComponent,
       PlayersViewComponent,
       PlayerAddComponent,
       GameComponent,
-      HomeComponent
+      HomeComponent,
+      BoardComponent,
+      GamesComponent,
+      NewGameComponent
    ],
    imports: [
       BrowserModule,
@@ -44,8 +51,8 @@ import { BoardReducer } from './board.reducer';
         user: UserReducer,
         board: BoardReducer
       })
-   ],
-   providers: [],
+ ],
+   providers: [ Utils ],
    bootstrap: [
       AppComponent
    ]

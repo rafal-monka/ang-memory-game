@@ -1,5 +1,39 @@
-.card {
-  width: 55px;
-  height: 55px;
+.game-panel {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.board {
+  margin-right: 5px;
+}
+
+.board-background {
+  width: 800px;
+  height: 800px;
+}
+
+.board-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap
+}
+
+.board-card {
+  width: 100px;
+  height: 100px;
+  border: dotted 1px lightgrey;
   text-align: center;
+}
+
+#your-move {
+  position: fixed;
+  font-size: large;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: green;
+  background-color: yellow;
+  z-index: 2001;
+  padding: 5px 40px 5px 40px;
 }

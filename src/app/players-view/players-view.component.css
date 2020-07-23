@@ -11,3 +11,8 @@
   padding: 4px;
   margin: 2px;
 }
+
+.player-connection-state-icon {
+    width: 12px;
+    height: 12px;
+}

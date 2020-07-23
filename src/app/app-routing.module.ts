@@ -6,14 +6,16 @@ import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from './auth/auth.guard';
 import { InterceptorService } from './auth/interceptor.service';
 import { ExternalApiComponent } from './external-api/external-api.component';
-import { WssComponent } from './wss/wss.component';
+import { GamesComponent } from './games/games.component';
+import { GameComponent } from './game/game.component';
 import { HomeComponent } from './home/home.component';
 
 const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'external-api', component: ExternalApiComponent, canActivate: [AuthGuard] },
-  { path: 'wss', redirectTo: 'wss/', pathMatch: 'full', canActivate: [AuthGuard] }, //@@@AUTH0
-  { path: 'wss/:gameid', component: WssComponent, canActivate: [AuthGuard] }, //@@@AUTH0
+  { path: 'games', component: GamesComponent, canActivate: [AuthGuard] }, //@@@AUTH0
+  { path: 'game', redirectTo: 'game/', pathMatch: 'full', canActivate: [AuthGuard] }, //@@@AUTH0
+  { path: 'game/:gameid', component: GameComponent, canActivate: [AuthGuard] }, //@@@AUTH0
   { path: 'test', component: HomeComponent},
   { path: "**", component : HomeComponent }
 ];

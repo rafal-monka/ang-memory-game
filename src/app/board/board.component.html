@@ -1,0 +1,31 @@
+<div *ngIf="game">
+  <div class="board"
+  *ngIf="['STARTED','ENDED'].indexOf(game.status)>-1 && board && pictures && pictures.length > 0">
+
+    <div class="board-background" [ngStyle]="{backgroundSize:'cover', backgroundImage:'url(../../assets/themes/'+game.theme+'/x-size/'+pictures[game.backgroundImage].imgsrc+')'}">
+
+      <div *ngIf="game.status==='STARTED'" [ngStyle]="{background:'rgba(255, 255, 255, 0.8)'}">
+
+        <div class="board-row" *ngFor="let row of _setSIZE; let r=index">
+
+            <div class="board-card"
+                *ngFor="let col of _setSIZE; let c=index"
+                (click)="onCardClick(r,c, board[r][c].value)"
+                [ngStyle]="{backgroundSize:'cover', backgroundImage:board[r][c].value<0?'':(board[r][c].open?'url(../../assets/themes/'+game.theme+'/'+pictures[board[r][c].value].imgsrc+')':'url(../../assets/themes/'+game.theme+'/_.jpg)')}">
+
+                <div>
+                    <b>{{board[r][c].value<0 ? '' : '^'+board[r][c].value }}</b>
+                    <!-- <br/><small style="color: blue">{{board[r][c].count}}</small> -->
+                </div>
+
+            </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

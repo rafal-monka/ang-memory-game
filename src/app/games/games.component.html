@@ -1,0 +1,11 @@
+<div>
+
+  <app-new-game></app-new-game>
+
+  <ul>
+    <li *ngFor="let game of (games$ | async)">
+      #<a href="/game/{{game.gameid}}">{{game.gameid}} {{game.theme}} | {{game.backgroundImage}} | {{game.name}} {{game.status}}</a>
+    </li>
+  </ul>
+
+</div>

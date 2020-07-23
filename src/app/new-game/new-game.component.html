@@ -1,0 +1,15 @@
+<div class="container">
+  <div class="row">
+    <div class="col-xs-2">
+        <select class="form-control" style="width:auto;" [(ngModel)]="selectedTheme">
+          <option *ngFor="let theme of themes; let i=index"
+                  value="{{theme.name}}">
+                  {{theme.name}}
+          </option>
+        </select>
+    </div>
+    <div class="col-xs-2">
+      <button class="btn btn-success" (click)="newGame()">New game</button>
+    </div>
+  </div>
+</div>
